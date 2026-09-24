@@ -1,900 +1,998 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+
+    <!-- Important for phone screens -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>EPICS EVEI Geofence</title>
+@@ -13,9 +12,10 @@
+<link
+rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    >
+
+<style>
+
 /* =========================
-   CREATE MAP
-========================= */
+          GENERAL
+       ========================= */
+@@ -81,13 +81,32 @@
+}
 
-const map = L.map("map").setView(
-    [40.4237, -86.9212],
-    15
-);
+
+        /* =========================
+           ACTIVE BOARD
+        ========================= */
+
+        .active-board {
+            margin-top: 15px;
+            padding: 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        #activeBoard {
+            font-size: 18px;
+        }
 
 
 /* =========================
-   OPEN STREET MAP
-========================= */
+          CONTROLS
+       ========================= */
+
+.controls {
+            display: flex;
+            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+gap: 10px;
+margin-top: 15px;
+}
+@@ -115,14 +134,27 @@
+transform: scale(0.98);
+}
+
+        /* Highlight active drawing button */
+
+        button.active {
+            background: #555;
+            outline: 3px solid #999;
+        }
+
+
+/* =========================
+          COORDINATES
+       ========================= */
+
+        .coordinates-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+.panel {
+background: white;
+            margin-top: 15px;
+padding: 15px;
+border-radius: 10px;
+border: 1px solid #ddd;
+@@ -133,9 +165,9 @@
+font-size: 20px;
+}
+
+        #coordinates {
+        textarea {
+width: 100%;
+            min-height: 120px;
+            min-height: 150px;
+
+padding: 10px;
+
+@@ -195,7 +227,6 @@
+}
+
+.controls {
+                display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 8px;
+}
+@@ -206,6 +237,10 @@
+padding: 10px 8px;
+}
+
+            .coordinates-container {
+                grid-template-columns: 1fr;
+            }
+
+.panel,
+.instructions {
+padding: 12px;
+@@ -216,7 +251,7 @@
+font-size: 18px;
+}
+
+            #coordinates {
+            textarea {
+font-size: 13px;
+}
+}
+@@ -257,56 +292,108 @@ <h1>EPICS EVEI Geofence</h1>
+</header>
+
+
+    <!-- =========================
+         MAIN
+    ========================= -->
+
+<main class="container">
+
+        <!-- MAP -->
+        <!-- =========================
+             MAP
+        ========================= -->
+
+<div id="map"></div>
+
+
+        <!-- CONTROLS -->
+        <!-- =========================
+             ACTIVE BOARD
+        ========================= -->
+
+        <div class="active-board">
+
+            Currently Drawing:
+
+            <span id="activeBoard">
+                Outer Board
+            </span>
+
+        </div>
+
+
+        <!-- =========================
+             CONTROLS
+        ========================= -->
+
+<div class="controls">
+
+            <button id="clearButton">
+                Clear All
+            <button id="outerButton" class="active">
+                Outer Board
+</button>
+
+            <button id="toggleButton">
+                Show / Hide Pins
+            <button id="innerButton">
+                Inner Board
+</button>
+
+<button id="finishButton">
+Finish Polygon
+</button>
+
+            <button id="clearOuterButton">
+                Clear Outer
+            </button>
+
+            <button id="clearInnerButton">
+                Clear Inner
+            </button>
+
+            <button id="toggleButton">
+                Show / Hide Pins
+            </button>
+
+<button id="locationButton">
+My Location
+</button>
+
+</div>
+
+
+        <!-- COORDINATES -->
+        <!-- =========================
+             COORDINATES
+        ========================= -->
+
+        <section class="panel">
+        <div class="coordinates-container">
+
+            <h2>Coordinates</h2>
+            <!-- Outer -->
+
+            <textarea
+                id="coordinates"
+                readonly
+                placeholder="Click on the map to add points..."
+            ></textarea>
+            <section class="panel">
+
+        </section>
+                <h2>Outer Board Coordinates</h2>
+
+                <textarea
+                    id="outerCoordinates"
+                    readonly
+                    placeholder="Outer board coordinates..."
+                ></textarea>
+
+            </section>
+
+        <!-- INSTRUCTIONS -->
+
+            <!-- Inner -->
+
+            <section class="panel">
+
+                <h2>Inner Board Coordinates</h2>
+
+                <textarea
+                    id="innerCoordinates"
+                    readonly
+                    placeholder="Inner board coordinates..."
+                ></textarea>
+
+            </section>
+
+        </div>
+
+
+        <!-- =========================
+             INSTRUCTIONS
+        ========================= -->
+
+<section class="instructions">
+
+@@ -315,25 +402,36 @@ <h2>Instructions</h2>
+<ol>
+
+<li>
+                    Click or tap the map to add a point.
+                    Select <strong>Outer Board</strong>
+                    to create the outside boundary.
+</li>
+
+<li>
+                    Continue adding points to create your geofence.
+                    Tap or click the map to add points.
+</li>
+
+<li>
+                    Drag markers to adjust their positions.
+                    Drag the markers to adjust their positions.
+</li>
+
+<li>
+Press <strong>Finish Polygon</strong>
+                    when you are finished.
+                    when the boundary is complete.
+                </li>
+
+                <li>
+                    Select <strong>Inner Board</strong>
+                    to create the inside boundary.
+                </li>
+
+                <li>
+                    Create the inner boundary the same way.
+</li>
+
+<li>
+                    Use <strong>Clear All</strong>
+                    to start over.
+                    Use <strong>Clear Outer</strong>
+                    or <strong>Clear Inner</strong>
+                    to remove one boundary.
+</li>
+
+</ol>
+@@ -343,7 +441,9 @@ <h2>Instructions</h2>
+</main>
+
+
+    <!-- Leaflet JavaScript -->
+    <!-- =========================
+         LEAFLET
+    ========================= -->
+
+<script
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+@@ -363,15 +463,16 @@ <h2>Instructions</h2>
+
+
+/* =========================
+           OPENSTREETMAP
+           OPEN STREET MAP
+       ========================= */
 
 L.tileLayer(
-    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap contributors"
-    }
+"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+{
+maxZoom: 19,
+
+attribution:
+                    '&copy; OpenStreetMap contributors'
+                    "&copy; OpenStreetMap contributors"
+}
 ).addTo(map);
 
+@@ -380,250 +481,549 @@ <h2>Instructions</h2>
+          VARIABLES
+       ========================= */
 
-/* =========================
-   VARIABLES
-========================= */
+        let markers = [];
+        let polygon = null;
+        let activeBoard = "outer";
 
-// Which type of boundary are we currently drawing?
-let activeBoard = "outer";
+        let outerMarkers = [];
+        let innerMarkers = [];
 
-// Points for the boundary currently being drawn
-let currentOuterMarkers = [];
-let currentInnerMarkers = [];
-
-// Completed boundaries
-let outerBoards = [];
-let innerBoards = [];
+        let outerPolygon = null;
+        let innerPolygon = null;
 
 let pinsVisible = true;
 
 
-/*
-Each completed boundary looks like:
+        /* =========================
+           BUTTONS
+        ========================= */
 
-{
-    markers: [...],
-    polygon: ...
-}
-*/
+        const outerButton =
+            document.getElementById("outerButton");
 
+        const innerButton =
+            document.getElementById("innerButton");
 
-/* =========================
-   BUTTONS
-========================= */
-
-const outerButton =
-    document.getElementById("outerButton");
-
-const innerButton =
-    document.getElementById("innerButton");
-
-const activeBoardText =
-    document.getElementById("activeBoard");
+        const activeBoardText =
+            document.getElementById("activeBoard");
 
 
-/* =========================
-   SELECT OUTER
-========================= */
+        /* =========================
+           SELECT OUTER BOARD
+        ========================= */
 
-outerButton.addEventListener(
-    "click",
-    function() {
+        outerButton.addEventListener(
+            "click",
+            function() {
 
-        activeBoard = "outer";
+                activeBoard = "outer";
 
-        activeBoardText.textContent =
-            "Outer Board " +
-            (outerBoards.length + 1);
+                activeBoardText.textContent =
+                    "Outer Board";
 
-        outerButton.classList.add("active");
-        innerButton.classList.remove("active");
-    }
-);
+                outerButton.classList.add("active");
+
+                innerButton.classList.remove("active");
+
+            }
+        );
 
 
-/* =========================
-   SELECT INNER
-========================= */
+        /* =========================
+           SELECT INNER BOARD
+        ========================= */
 
-innerButton.addEventListener(
-    "click",
-    function() {
+        innerButton.addEventListener(
+            "click",
+            function() {
 
-        activeBoard = "inner";
+                activeBoard = "inner";
 
-        activeBoardText.textContent =
-            "Inner Board " +
-            (innerBoards.length + 1);
+                activeBoardText.textContent =
+                    "Inner Board";
 
-        innerButton.classList.add("active");
-        outerButton.classList.remove("active");
-    }
-);
+                innerButton.classList.add("active");
+
+                outerButton.classList.remove("active");
+
+            }
+        );
 
 
 /* =========================
-   UPDATE COORDINATES
-========================= */
+          UPDATE COORDINATES
+       ========================= */
 
 function updateCoordinates() {
 
-    let outerOutput = "";
+            let output = "";
+            let outerOutput = "";
 
-    // Completed outer boundaries
-    outerBoards.forEach(
-        function(board, boardIndex) {
+            markers.forEach(function(marker, index) {
+            outerMarkers.forEach(
+                function(marker, index) {
 
-            outerOutput +=
-                "Outer Board " +
-                (boardIndex + 1) +
-                ":\n";
-
-            board.markers.forEach(
-                function(marker, pointIndex) {
-
+                const position = marker.getLatLng();
                     const position =
                         marker.getLatLng();
 
-                    outerOutput +=
-                        "  " +
-                        (pointIndex + 1) +
-                        ". " +
-                        position.lat.toFixed(6) +
-                        ", " +
-                        position.lng.toFixed(6) +
-                        "\n";
-                }
-            );
-
-            outerOutput += "\n";
-        }
-    );
-
-
-    // Currently drawing outer boundary
-    if (currentOuterMarkers.length > 0) {
-
-        outerOutput +=
-            "Outer Board " +
-            (outerBoards.length + 1) +
-            " (in progress):\n";
-
-        currentOuterMarkers.forEach(
-            function(marker, pointIndex) {
-
-                const position =
-                    marker.getLatLng();
-
-                outerOutput +=
-                    "  " +
-                    (pointIndex + 1) +
+                output +=
+                    (index + 1) +
                     ". " +
                     position.lat.toFixed(6) +
                     ", " +
                     position.lng.toFixed(6) +
                     "\n";
-            }
-        );
-    }
+                    outerOutput +=
+                        (index + 1) +
+                        ". " +
+                        position.lat.toFixed(6) +
+                        ", " +
+                        position.lng.toFixed(6) +
+                        "\n";
+
+                }
+            );
 
 
-    let innerOutput = "";
+            let innerOutput = "";
 
-
-    // Completed inner boundaries
-    innerBoards.forEach(
-        function(board, boardIndex) {
-
-            innerOutput +=
-                "Inner Board " +
-                (boardIndex + 1) +
-                ":\n";
-
-            board.markers.forEach(
-                function(marker, pointIndex) {
+            innerMarkers.forEach(
+                function(marker, index) {
 
                     const position =
                         marker.getLatLng();
 
                     innerOutput +=
-                        "  " +
-                        (pointIndex + 1) +
+                        (index + 1) +
                         ". " +
                         position.lat.toFixed(6) +
                         ", " +
                         position.lng.toFixed(6) +
                         "\n";
+
                 }
             );
 
-            innerOutput += "\n";
-        }
-    );
+            });
+
+document.getElementById(
+                "coordinates"
+            ).value = output;
+                "outerCoordinates"
+            ).value = outerOutput;
 
 
-    // Currently drawing inner boundary
-    if (currentInnerMarkers.length > 0) {
+            document.getElementById(
+                "innerCoordinates"
+            ).value = innerOutput;
 
-        innerOutput +=
-            "Inner Board " +
-            (innerBoards.length + 1) +
-            " (in progress):\n";
-
-        currentInnerMarkers.forEach(
-            function(marker, pointIndex) {
-
-                const position =
-                    marker.getLatLng();
-
-                innerOutput +=
-                    "  " +
-                    (pointIndex + 1) +
-                    ". " +
-                    position.lat.toFixed(6) +
-                    ", " +
-                    position.lng.toFixed(6) +
-                    "\n";
-            }
-        );
-    }
-
-
-    document.getElementById(
-        "outerCoordinates"
-    ).value = outerOutput;
-
-
-    document.getElementById(
-        "innerCoordinates"
-    ).value = innerOutput;
 }
 
 
 /* =========================
-   DRAW POLYGON
-========================= */
+           REDRAW POLYGON
+           DRAW OUTER POLYGON
+       ========================= */
 
-function redrawPolygon(board) {
+        function redrawPolygon() {
+        function redrawOuterPolygon() {
 
-    // Remove old polygon
-    if (board.polygon) {
+            if (outerPolygon) {
 
-        map.removeLayer(
-            board.polygon
-        );
-    }
+                map.removeLayer(
+                    outerPolygon
+                );
+
+            if (polygon) {
+                map.removeLayer(polygon);
+                polygon = null;
+                outerPolygon = null;
+}
+
+            if (markers.length >= 3) {
+
+            if (outerMarkers.length >= 3) {
+
+const points =
+                    markers.map(function(marker) {
+                        return marker.getLatLng();
+                    });
+
+                polygon = L.polygon(
+                    points,
+                    {
+                        color: "blue",
+                        fillOpacity: 0.2
+                    }
+                ).addTo(map);
+                    outerMarkers.map(
+                        function(marker) {
+
+                            return marker.getLatLng();
+
+                        }
+                    );
 
 
-    if (board.markers.length >= 3) {
+                outerPolygon =
+                    L.polygon(
+                        points,
+                        {
+                            color: "blue",
+                            fillOpacity: 0.20
+                        }
+                    ).addTo(map);
 
-        const points =
-            board.markers.map(
-                function(marker) {
-                    return marker.getLatLng();
-                }
-            );
+}
 
-
-        board.polygon =
-            L.polygon(
-                points,
-                {
-                    color:
-                        board.type === "outer"
-                            ? "blue"
-                            : "red",
-
-                    fillOpacity: 0.20
-                }
-            ).addTo(map);
-    }
 }
 
 
 /* =========================
-   DRAW CURRENT POLYGON
-========================= */
+           ADD POINT
+           DRAW INNER POLYGON
+       ========================= */
 
-function redrawCurrentPolygon(
-    markers,
-    type
-) {
+        map.on("click", function(event) {
 
-    // Use a temporary polygon
-    const points =
-        markers.map(
-            function(marker) {
-                return marker.getLatLng();
-            }
-        );
-
-
-    // Remove previous temporary polygon
-    if (
-        type === "outer" &&
-        window.currentOuterPolygon
-    ) {
-
-        map.removeLayer(
-            window.currentOuterPolygon
-        );
-
-        window.currentOuterPolygon = null;
-    }
-
-
-    if (
-        type === "inner" &&
-        window.currentInnerPolygon
-    ) {
-
-        map.removeLayer(
-            window.currentInnerPolygon
-        );
-
-        window.currentInnerPolygon = null;
-    }
-
-
-    if (markers.length >= 3) {
-
-        const polygon =
-            L.polygon(
-                points,
-                {
-                    color:
-                        type === "outer"
-                            ? "blue"
-                            : "red",
-
-                    fillOpacity: 0.20,
-
-                    dashArray: "5, 5"
-                }
-            ).addTo(map);
-
-
-        if (type === "outer") {
-
-            window.currentOuterPolygon =
-                polygon;
-
-        } else {
-
-            window.currentInnerPolygon =
-                polygon;
-        }
-    }
-}
-
-
-/* =========================
-   ADD POINT TO MAP
-========================= */
-
-map.on(
-    "click",
-    function(event) {
-
-        const marker =
-            L.marker(
+            const marker = L.marker(
                 event.latlng,
                 {
                     draggable: true
                 }
             ).addTo(map);
+        function redrawInnerPolygon() {
 
+            markers.push(marker);
+            if (innerPolygon) {
 
-        /* =====================
-           OUTER
-        ===================== */
-
-        if (activeBoard === "outer") {
-
-            currentOuterMarkers.push(
-                marker
-            );
-
-
-            marker.on(
-                "drag",
-                function() {
-
-                    updateCoordinates();
-
-                    redrawCurrentPolygon(
-                        currentOuterMarkers,
-                        "outer"
-                    );
-                }
-            );
-
-
-            redrawCurrentPolygon(
-                currentOuterMarkers,
-                "outer"
-            );
-        }
-
-
-        /* =====================
-           INNER
-        ===================== */
-
-        else {
-
-            currentInnerMarkers.push(
-                marker
-            );
-
-
-            marker.on(
-                "drag",
-                function() {
-
-                    updateCoordinates();
-
-                    redrawCurrentPolygon(
-                        currentInnerMarkers,
-                        "inner"
-                    );
-                }
-            );
-
-
-            redrawCurrentPolygon(
-                currentInnerMarkers,
-                "inner"
-            );
-        }
-
-
-        updateCoordinates();
-    }
-);
-
-
-/* =========================
-   FINISH POLYGON
-========================= */
-
-document
-    .getElementById("finishButton")
-    .addEventListener(
-        "click",
-        function() {
-
-
-            /* =====================
-               FINISH OUTER
-            ===================== */
-
-            if (activeBoard === "outer") {
-
-                if (
-                    currentOuterMarkers.length < 3
-                ) {
-
-                    alert(
-                        "Outer Board needs at least 3 points."
-                    );
-
-                    return;
-                }
-
-
-                // Remove temporary polygon
-                if (
-                    window.currentOuterPolygon
-                ) {
-
-                    map.removeLayer(
-                        window.currentOuterPolygon
-                    );
-
-                    window.currentOuterPolygon =
-                        null;
-                }
-
-
-                // Create completed board
-                const board = {
-
-                    type: "outer",
-
-                    markers:
-                        currentOuterMarkers,
-
-                    polygon: null
-                };
-
-
-                // Draw completed polygon
-                redrawPolygon(board);
-
-
-                // Save it
-                outerBoards.push(
-                    board
+                map.removeLayer(
+                    innerPolygon
                 );
 
-
-                // Start a NEW outer boundary
-                currentOuterMarkers = [];
-
-
-                activeBoardText.textContent =
-                    "Outer Board " +
-                    (outerBoards.length + 1);
-
-
-                updateCoordinates();
-
-
-                alert(
-                    "Outer Board " +
-                    outerBoards.length +
-                    " completed!"
-                );
+            marker.on("drag", function() {
+                innerPolygon = null;
             }
 
-
-            /* =====================
-               FINISH INNER
-            ===================== */
-
-            else {
-
-                if (
-                    currentInnerMarkers.length < 3
-                ) {
-
-                    alert(
-                        "Inner Board needs at least 3 points."
-                    );
-
-                    return;
-                }
-
-
-                // Remove temporary polygon
-                if (
-                    window.currentInnerPolygon
-                ) {
-
-                    map.removeLayer(
-                        window.currentInnerPolygon
-                    );
-
-                    window.currentInnerPolygon =
-                        null;
-                }
-
-
-                // Create completed board
-                const board = {
-
-                    type: "inner",
-
-                    markers:
-                        currentInnerMarkers,
-
-                    polygon: null
-                };
-
-
-                // Draw completed polygon
-                redrawPolygon(board);
-
-
-                // Save it
-                innerBoards.push(
-                    board
-                );
-
-
-                // Start a NEW inner boundary
-                currentInnerMarkers = [];
-
-
-                activeBoardText.textContent =
-                    "Inner Board " +
-                    (innerBoards.length + 1);
-
-
                 updateCoordinates();
+                redrawPolygon();
 
+            });
+            if (innerMarkers.length >= 3) {
 
-                alert(
-                    "Inner Board " +
-                    innerBoards.length +
-                    " completed!"
-                );
-            }
-        }
-    );
-
-
-/* =========================
-   CLEAR ALL OUTER
-========================= */
-
-document
-    .getElementById("clearOuterButton")
-    .addEventListener(
-        "click",
-        function() {
-
-
-            // Remove completed outer boards
-            outerBoards.forEach(
-                function(board) {
-
-                    board.markers.forEach(
+                const points =
+                    innerMarkers.map(
                         function(marker) {
 
-                            map.removeLayer(
-                                marker
-                            );
+            marker.on("dragend", function() {
+                            return marker.getLatLng();
+
+                updateCoordinates();
+                redrawPolygon();
                         }
                     );
 
+            });
 
-                    if (board.polygon) {
-
-                        map.removeLayer(
-                            board.polygon
-                        );
-                    }
-                }
-            );
-
-
-            // Remove current outer markers
-            currentOuterMarkers.forEach(
-                function(marker) {
-
-                    map.removeLayer(
-                        marker
-                    );
-                }
-            );
-
-
-            // Remove temporary polygon
-            if (
-                window.currentOuterPolygon
-            ) {
-
-                map.removeLayer(
-                    window.currentOuterPolygon
-                );
-
-                window.currentOuterPolygon =
-                    null;
-            }
-
-
-            outerBoards = [];
-
-            currentOuterMarkers = [];
-
+                innerPolygon =
+                    L.polygon(
+                        points,
+                        {
+                            color: "red",
+                            fillOpacity: 0.25
+                        }
+                    ).addTo(map);
 
             updateCoordinates();
+            redrawPolygon();
+            }
 
-
-            activeBoardText.textContent =
-                "Outer Board 1";
+        });
         }
-    );
 
 
 /* =========================
-   CLEAR ALL INNER
-========================= */
+           CLEAR ALL
+           ADD POINT TO MAP
+       ========================= */
 
-document
-    .getElementById("clearInnerButton")
-    .addEventListener(
-        "click",
-        function() {
+        document
+            .getElementById("clearButton")
+            .addEventListener("click", function() {
+        map.on(
+            "click",
+            function(event) {
+
+                const marker =
+                    L.marker(
+                        event.latlng,
+                        {
+                            draggable: true
+                        }
+                    ).addTo(map);
 
 
-            // Remove completed inner boards
-            innerBoards.forEach(
-                function(board) {
+                /* OUTER */
 
-                    board.markers.forEach(
-                        function(marker) {
+                markers.forEach(function(marker) {
+                    map.removeLayer(marker);
+                });
+                if (activeBoard === "outer") {
 
-                            map.removeLayer(
-                                marker
-                            );
+                markers = [];
+                    outerMarkers.push(
+                        marker
+                    );
+
+                    marker.on(
+                        "drag",
+                        function() {
+
+                            updateCoordinates();
+                            redrawOuterPolygon();
+
                         }
                     );
 
+                    redrawOuterPolygon();
 
-                    if (board.polygon) {
-
-                        map.removeLayer(
-                            board.polygon
-                        );
-                    }
                 }
-            );
 
 
-            // Remove current inner markers
-            currentInnerMarkers.forEach(
-                function(marker) {
+                /* INNER */
 
-                    map.removeLayer(
+                else {
+
+                    innerMarkers.push(
                         marker
                     );
-                }
-            );
+
+                    marker.on(
+                        "drag",
+                        function() {
+
+                            updateCoordinates();
+                            redrawInnerPolygon();
+
+                        }
+                    );
+
+                    redrawInnerPolygon();
+
+                if (polygon) {
+                    map.removeLayer(polygon);
+                    polygon = null;
+}
 
 
-            // Remove temporary polygon
-            if (
-                window.currentInnerPolygon
-            ) {
+updateCoordinates();
 
-                map.removeLayer(
-                    window.currentInnerPolygon
-                );
-
-                window.currentInnerPolygon =
-                    null;
+            });
             }
-
-
-            innerBoards = [];
-
-            currentInnerMarkers = [];
-
-
-            updateCoordinates();
-
-
-            activeBoardText.textContent =
-                "Inner Board 1";
-        }
-    );
+        );
 
 
 /* =========================
-   SHOW / HIDE PINS
-========================= */
+           SHOW / HIDE PINS
+           FINISH POLYGON
+       ========================= */
 
 document
-    .getElementById("toggleButton")
-    .addEventListener(
-        "click",
-        function() {
+            .getElementById("toggleButton")
+            .addEventListener("click", function() {
+            .getElementById("finishButton")
+            .addEventListener(
+                "click",
+                function() {
 
-            pinsVisible =
-                !pinsVisible;
+                    if (
+                        activeBoard === "outer"
+                    ) {
 
+                pinsVisible = !pinsVisible;
+                        if (
+                            outerMarkers.length < 3
+                        ) {
 
-            const allMarkers = [];
+                            alert(
+                                "Outer Board needs at least 3 points."
+                            );
 
+                markers.forEach(function(marker) {
+                            return;
+                        }
 
-            // Completed outer
-            outerBoards.forEach(
-                function(board) {
+                        redrawOuterPolygon();
 
-                    allMarkers.push(
-                        ...board.markers
-                    );
-                }
-            );
-
-
-            // Completed inner
-            innerBoards.forEach(
-                function(board) {
-
-                    allMarkers.push(
-                        ...board.markers
-                    );
-                }
-            );
-
-
-            // Current outer
-            allMarkers.push(
-                ...currentOuterMarkers
-            );
-
-
-            // Current inner
-            allMarkers.push(
-                ...currentInnerMarkers
-            );
-
-
-            allMarkers.forEach(
-                function(marker) {
+                        alert(
+                            "Outer Board completed!"
+                        );
 
                     if (pinsVisible) {
-
                         marker.addTo(map);
-
                     } else {
+                        map.removeLayer(marker);
+}
 
-                        map.removeLayer(
-                            marker
+                });
+                    else {
+
+            });
+                        if (
+                            innerMarkers.length < 3
+                        ) {
+
+                            alert(
+                                "Inner Board needs at least 3 points."
+                            );
+
+                            return;
+                        }
+
+                        redrawInnerPolygon();
+
+                        alert(
+                            "Inner Board completed!"
                         );
+
                     }
+
                 }
             );
-        }
-    );
 
 
 /* =========================
-   MY LOCATION
-========================= */
+           FINISH POLYGON
+           CLEAR OUTER
+       ========================= */
 
 document
-    .getElementById("locationButton")
-    .addEventListener(
-        "click",
-        function() {
+            .getElementById("finishButton")
+            .addEventListener("click", function() {
+            .getElementById(
+                "clearOuterButton"
+            )
+            .addEventListener(
+                "click",
+                function() {
 
-            if (
-                !navigator.geolocation
-            ) {
+                if (markers.length < 3) {
+                    outerMarkers.forEach(
+                        function(marker) {
+
+                    alert(
+                        "You need at least 3 points."
+                            map.removeLayer(marker);
+
+                        }
+);
+
+                    return;
+                }
+
+                redrawPolygon();
+                    outerMarkers = [];
 
                 alert(
-                    "Geolocation is not supported by your browser."
+                    "Geofence polygon created!"
                 );
 
-                return;
-            }
+            });
+                    if (outerPolygon) {
+
+                        map.removeLayer(
+                            outerPolygon
+                        );
+
+                        outerPolygon = null;
+
+                    }
 
 
-            navigator.geolocation
-                .getCurrentPosition(
+                    updateCoordinates();
+
+                }
+            );
+
+
+/* =========================
+           MY LOCATION
+           CLEAR INNER
+       ========================= */
+
+document
+            .getElementById("locationButton")
+            .addEventListener("click", function() {
+            .getElementById(
+                "clearInnerButton"
+            )
+            .addEventListener(
+                "click",
+                function() {
+
+                if (!navigator.geolocation) {
+                    innerMarkers.forEach(
+                        function(marker) {
+
+                    alert(
+                        "Geolocation is not supported by your browser."
+                            map.removeLayer(marker);
+
+                        }
+);
+
+                    return;
+                }
+
+                    innerMarkers = [];
+
+
+                    if (innerPolygon) {
+
+                        map.removeLayer(
+                            innerPolygon
+                        );
+
+                        innerPolygon = null;
+
+                    }
+
+                navigator.geolocation.getCurrentPosition(
 
                     function(position) {
+                    updateCoordinates();
+
+                }
+            );
 
                         const lat =
                             position.coords.latitude;
 
                         const lng =
                             position.coords.longitude;
+        /* =========================
+           SHOW / HIDE PINS
+        ========================= */
 
+        document
+            .getElementById(
+                "toggleButton"
+            )
+            .addEventListener(
+                "click",
+                function() {
 
                         map.setView(
                             [lat, lng],
                             18
-                        );
+                    pinsVisible =
+                        !pinsVisible;
 
 
-                        L.marker(
-                            [lat, lng]
-                        )
+                    const allMarkers =
+                        outerMarkers.concat(
+                            innerMarkers
+);
+
+
+                        L.marker([lat, lng])
                             .addTo(map)
                             .bindPopup(
                                 "Your location"
                             )
                             .openPopup();
-                    },
+                    allMarkers.forEach(
+                        function(marker) {
 
+                            if (pinsVisible) {
+
+                                marker.addTo(map);
+
+                    },
+                            }
 
                     function() {
+                            else {
 
-                        alert(
+                                map.removeLayer(
+                                    marker
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /* =========================
+           MY LOCATION
+        ========================= */
+
+        document
+            .getElementById(
+                "locationButton"
+            )
+            .addEventListener(
+                "click",
+                function() {
+
+                    if (
+                        !navigator.geolocation
+                    ) {
+
+alert(
                             "Unable to get your location."
-                        );
-                    }
+                            "Geolocation is not supported by your browser."
+);
+
+                        return;
+}
+
                 );
-        }
-    );
+
+            });
+                    navigator.geolocation
+                        .getCurrentPosition(
+
+                            function(position) {
+
+                                const lat =
+                                    position.coords.latitude;
+
+                                const lng =
+                                    position.coords.longitude;
+
+
+                                map.setView(
+                                    [lat, lng],
+                                    18
+                                );
+
+
+                                L.marker(
+                                    [lat, lng]
+                                )
+                                    .addTo(map)
+                                    .bindPopup(
+                                        "Your location"
+                                    )
+                                    .openPopup();
+
+                            },
+
+                            function() {
+
+                                alert(
+                                    "Unable to get your location."
+                                );
+
+                            }
+
+                        );
+
+                }
+            );
 
 
 /* =========================
-   FIX MAP SIZE
-========================= */
+          FIX MAP SIZE
+       ========================= */
 
-setTimeout(
-    function() {
+        setTimeout(function() {
+            map.invalidateSize();
+        }, 200);
+        setTimeout(
+            function() {
 
-        map.invalidateSize();
+                map.invalidateSize();
 
-    },
-    200
-);
+            },
+            200
+        );
+
+</script>
