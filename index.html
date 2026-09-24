@@ -1,3 +1,4 @@
+```
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,7 +12,7 @@
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    >
+    />
 
     <style>
 
@@ -132,8 +133,6 @@
         button:active {
             transform: scale(0.98);
         }
-
-        /* Highlight active drawing button */
 
         button.active {
             background: #555;
@@ -282,10 +281,6 @@
 
 <body>
 
-    <!-- =========================
-         HEADER
-    ========================= -->
-
     <header>
         <h1>EPICS EVEI Geofence</h1>
     </header>
@@ -293,16 +288,12 @@
 
     <main class="container">
 
-        <!-- =========================
-             MAP
-        ========================= -->
+        <!-- MAP -->
 
         <div id="map"></div>
 
 
-        <!-- =========================
-             ACTIVE BOARD
-        ========================= -->
+        <!-- CURRENT BOARD -->
 
         <div class="active-board">
 
@@ -315,9 +306,7 @@
         </div>
 
 
-        <!-- =========================
-             CONTROLS
-        ========================= -->
+        <!-- CONTROLS -->
 
         <div class="controls">
 
@@ -327,6 +316,10 @@
 
             <button id="innerButton">
                 Inner Board
+            </button>
+
+            <button id="locationButton">
+                📍 Add My Location
             </button>
 
             <button id="finishButton">
@@ -345,20 +338,12 @@
                 Show / Hide Pins
             </button>
 
-            <button id="locationButton">
-                My Location
-            </button>
-
         </div>
 
 
-        <!-- =========================
-             COORDINATES
-        ========================= -->
+        <!-- COORDINATES -->
 
         <div class="coordinates-container">
-
-            <!-- Outer -->
 
             <section class="panel">
 
@@ -372,8 +357,6 @@
 
             </section>
 
-
-            <!-- Inner -->
 
             <section class="panel">
 
@@ -390,9 +373,7 @@
         </div>
 
 
-        <!-- =========================
-             INSTRUCTIONS
-        ========================= -->
+        <!-- INSTRUCTIONS -->
 
         <section class="instructions">
 
@@ -402,35 +383,40 @@
 
                 <li>
                     Select <strong>Outer Board</strong>
-                    to create the outside boundary.
+                    or <strong>Inner Board</strong>.
                 </li>
 
                 <li>
-                    Tap or click the map to add points.
+                    Tap the map to manually add a point.
                 </li>
 
                 <li>
-                    Drag the markers to adjust their positions.
+                    Or press <strong>📍 Add My Location</strong>
+                    to use your phone's current GPS location.
+                </li>
+
+                <li>
+                    You can press <strong>Add My Location</strong>
+                    multiple times to create multiple GPS points.
+                </li>
+
+                <li>
+                    Drag any pin to adjust its position.
+                </li>
+
+                <li>
+                    You need at least 3 points to create a polygon.
                 </li>
 
                 <li>
                     Press <strong>Finish Polygon</strong>
-                    when the boundary is complete.
-                </li>
-
-                <li>
-                    Select <strong>Inner Board</strong>
-                    to create the inside boundary.
-                </li>
-
-                <li>
-                    Create the inner boundary the same way.
+                    when you are finished.
                 </li>
 
                 <li>
                     Use <strong>Clear Outer</strong>
                     or <strong>Clear Inner</strong>
-                    to remove one boundary.
+                    to remove a boundary.
                 </li>
 
             </ol>
@@ -440,9 +426,7 @@
     </main>
 
 
-    <!-- =========================
-         LEAFLET
-    ========================= -->
+    <!-- Leaflet JavaScript -->
 
     <script
         src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
@@ -462,7 +446,7 @@
 
 
         /* =========================
-           OPEN STREET MAP
+           OPENSTREETMAP
         ========================= */
 
         L.tileLayer(
@@ -492,7 +476,7 @@
 
 
         /* =========================
-           BUTTONS
+           BUTTON REFERENCES
         ========================= */
 
         const outerButton =
@@ -511,7 +495,7 @@
 
         outerButton.addEventListener(
             "click",
-            function() {
+            function () {
 
                 activeBoard = "outer";
 
@@ -532,7 +516,7 @@
 
         innerButton.addEventListener(
             "click",
-            function() {
+            function () {
 
                 activeBoard = "inner";
 
@@ -556,7 +540,7 @@
             let outerOutput = "";
 
             outerMarkers.forEach(
-                function(marker, index) {
+                function (marker, index) {
 
                     const position =
                         marker.getLatLng();
@@ -576,7 +560,7 @@
             let innerOutput = "";
 
             innerMarkers.forEach(
-                function(marker, index) {
+                function (marker, index) {
 
                     const position =
                         marker.getLatLng();
@@ -606,7 +590,7 @@
 
 
         /* =========================
-           DRAW OUTER POLYGON
+           REDRAW OUTER
         ========================= */
 
         function redrawOuterPolygon() {
@@ -625,7 +609,7 @@
 
                 const points =
                     outerMarkers.map(
-                        function(marker) {
+                        function (marker) {
 
                             return marker.getLatLng();
 
@@ -648,7 +632,7 @@
 
 
         /* =========================
-           DRAW INNER POLYGON
+           REDRAW INNER
         ========================= */
 
         function redrawInnerPolygon() {
@@ -667,7 +651,7 @@
 
                 const points =
                     innerMarkers.map(
-                        function(marker) {
+                        function (marker) {
 
                             return marker.getLatLng();
 
@@ -690,72 +674,246 @@
 
 
         /* =========================
-           ADD POINT TO MAP
+           ADD MARKER
+        ========================= */
+
+        function addMarker(
+            latlng,
+            source = "Map"
+        ) {
+
+            const marker =
+                L.marker(
+                    latlng,
+                    {
+                        draggable: true
+                    }
+                ).addTo(map);
+
+
+            /* =========================
+               OUTER BOARD
+            ========================= */
+
+            if (activeBoard === "outer") {
+
+                outerMarkers.push(marker);
+
+
+                marker.bindPopup(
+                    "Outer Board<br>" +
+                    "Source: " +
+                    source
+                );
+
+
+                marker.on(
+                    "drag",
+                    function () {
+
+                        updateCoordinates();
+
+                        redrawOuterPolygon();
+
+                    }
+                );
+
+            }
+
+
+            /* =========================
+               INNER BOARD
+            ========================= */
+
+            else {
+
+                innerMarkers.push(marker);
+
+
+                marker.bindPopup(
+                    "Inner Board<br>" +
+                    "Source: " +
+                    source
+                );
+
+
+                marker.on(
+                    "drag",
+                    function () {
+
+                        updateCoordinates();
+
+                        redrawInnerPolygon();
+
+                    }
+                );
+
+            }
+
+
+            updateCoordinates();
+
+            redrawOuterPolygon();
+
+            redrawInnerPolygon();
+
+
+            return marker;
+        }
+
+
+        /* =========================
+           ADD POINT BY MAP CLICK
         ========================= */
 
         map.on(
             "click",
-            function(event) {
+            function (event) {
 
-                const marker =
-                    L.marker(
-                        event.latlng,
-                        {
-                            draggable: true
-                        }
-                    ).addTo(map);
-
-
-                /* OUTER */
-
-                if (activeBoard === "outer") {
-
-                    outerMarkers.push(
-                        marker
-                    );
-
-                    marker.on(
-                        "drag",
-                        function() {
-
-                            updateCoordinates();
-                            redrawOuterPolygon();
-
-                        }
-                    );
-
-                    redrawOuterPolygon();
-
-                }
-
-
-                /* INNER */
-
-                else {
-
-                    innerMarkers.push(
-                        marker
-                    );
-
-                    marker.on(
-                        "drag",
-                        function() {
-
-                            updateCoordinates();
-                            redrawInnerPolygon();
-
-                        }
-                    );
-
-                    redrawInnerPolygon();
-
-                }
-
-
-                updateCoordinates();
+                addMarker(
+                    event.latlng,
+                    "Map"
+                );
 
             }
         );
+
+
+        /* =========================
+           ADD CURRENT GPS LOCATION
+        ========================= */
+
+        document
+            .getElementById("locationButton")
+            .addEventListener(
+                "click",
+                function () {
+
+                    if (!navigator.geolocation) {
+
+                        alert(
+                            "Geolocation is not supported by this browser."
+                        );
+
+                        return;
+                    }
+
+
+                    /*
+                     * Ask the phone/browser
+                     * for its current location.
+                     */
+
+                    navigator.geolocation.getCurrentPosition(
+
+                        function (position) {
+
+                            const lat =
+                                position.coords.latitude;
+
+                            const lng =
+                                position.coords.longitude;
+
+
+                            const location =
+                                L.latLng(
+                                    lat,
+                                    lng
+                                );
+
+
+                            /*
+                             * Move map to GPS location.
+                             */
+
+                            map.setView(
+                                location,
+                                18
+                            );
+
+
+                            /*
+                             * Add GPS location
+                             * to currently selected board.
+                             */
+
+                            const marker =
+                                addMarker(
+                                    location,
+                                    "GPS"
+                                );
+
+
+                            /*
+                             * Open popup.
+                             */
+
+                            marker
+                                .bindPopup(
+                                    activeBoard === "outer"
+                                        ? "Outer Board<br>GPS Location"
+                                        : "Inner Board<br>GPS Location"
+                                )
+                                .openPopup();
+
+                        },
+
+
+                        /* =========================
+                           LOCATION ERROR
+                        ========================= */
+
+                        function (error) {
+
+                            if (error.code === 1) {
+
+                                alert(
+                                    "Location permission was denied. Please allow location access in your browser."
+                                );
+
+                            }
+
+                            else if (error.code === 2) {
+
+                                alert(
+                                    "Your location could not be determined."
+                                );
+
+                            }
+
+                            else if (error.code === 3) {
+
+                                alert(
+                                    "The location request timed out. Please try again."
+                                );
+
+                            }
+
+                            else {
+
+                                alert(
+                                    "Unable to get your location."
+                                );
+
+                            }
+
+                        },
+
+
+                        /* =========================
+                           GPS OPTIONS
+                        ========================= */
+
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 15000,
+                            maximumAge: 0
+                        }
+
+                    );
+
+                }
+            );
 
 
         /* =========================
@@ -766,11 +924,9 @@
             .getElementById("finishButton")
             .addEventListener(
                 "click",
-                function() {
+                function () {
 
-                    if (
-                        activeBoard === "outer"
-                    ) {
+                    if (activeBoard === "outer") {
 
                         if (
                             outerMarkers.length < 3
@@ -783,7 +939,9 @@
                             return;
                         }
 
+
                         redrawOuterPolygon();
+
 
                         alert(
                             "Outer Board completed!"
@@ -804,7 +962,9 @@
                             return;
                         }
 
+
                         redrawInnerPolygon();
+
 
                         alert(
                             "Inner Board completed!"
@@ -826,12 +986,14 @@
             )
             .addEventListener(
                 "click",
-                function() {
+                function () {
 
                     outerMarkers.forEach(
-                        function(marker) {
+                        function (marker) {
 
-                            map.removeLayer(marker);
+                            map.removeLayer(
+                                marker
+                            );
 
                         }
                     );
@@ -867,12 +1029,14 @@
             )
             .addEventListener(
                 "click",
-                function() {
+                function () {
 
                     innerMarkers.forEach(
-                        function(marker) {
+                        function (marker) {
 
-                            map.removeLayer(marker);
+                            map.removeLayer(
+                                marker
+                            );
 
                         }
                     );
@@ -903,12 +1067,10 @@
         ========================= */
 
         document
-            .getElementById(
-                "toggleButton"
-            )
+            .getElementById("toggleButton")
             .addEventListener(
                 "click",
-                function() {
+                function () {
 
                     pinsVisible =
                         !pinsVisible;
@@ -921,7 +1083,7 @@
 
 
                     allMarkers.forEach(
-                        function(marker) {
+                        function (marker) {
 
                             if (pinsVisible) {
 
@@ -945,78 +1107,11 @@
 
 
         /* =========================
-           MY LOCATION
-        ========================= */
-
-        document
-            .getElementById(
-                "locationButton"
-            )
-            .addEventListener(
-                "click",
-                function() {
-
-                    if (
-                        !navigator.geolocation
-                    ) {
-
-                        alert(
-                            "Geolocation is not supported by your browser."
-                        );
-
-                        return;
-                    }
-
-
-                    navigator.geolocation
-                        .getCurrentPosition(
-
-                            function(position) {
-
-                                const lat =
-                                    position.coords.latitude;
-
-                                const lng =
-                                    position.coords.longitude;
-
-
-                                map.setView(
-                                    [lat, lng],
-                                    18
-                                );
-
-
-                                L.marker(
-                                    [lat, lng]
-                                )
-                                    .addTo(map)
-                                    .bindPopup(
-                                        "Your location"
-                                    )
-                                    .openPopup();
-
-                            },
-
-                            function() {
-
-                                alert(
-                                    "Unable to get your location."
-                                );
-
-                            }
-
-                        );
-
-                }
-            );
-
-
-        /* =========================
            FIX MAP SIZE
         ========================= */
 
         setTimeout(
-            function() {
+            function () {
 
                 map.invalidateSize();
 
