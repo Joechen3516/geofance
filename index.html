@@ -1,51 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>EPICS EVEI Geofence</title>
 
-    <!-- Leaflet CSS -->
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    >
+    />
 
     <style>
-
-        /* =========================
-           GENERAL
-        ========================= */
-
         * {
             box-sizing: border-box;
         }
 
-        html,
         body {
             margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100%;
             font-family: Arial, sans-serif;
-            overflow-x: hidden;
+            background: #f4f4f4;
         }
-
-        body {
-            background: #f5f5f5;
-        }
-
-
-        /* =========================
-           HEADER
-        ========================= */
 
         header {
             background: #222;
             color: white;
-            padding: 15px 20px;
+            text-align: center;
+            padding: 15px;
         }
 
         header h1 {
@@ -53,1519 +34,865 @@
             font-size: 24px;
         }
 
-
-        /* =========================
-           CONTAINER
-        ========================= */
-
-        .container {
-            width: 100%;
-            max-width: 1400px;
-            margin: auto;
-            padding: 15px;
+        #status {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #ddd;
         }
-
-
-        /* =========================
-           MAP
-        ========================= */
 
         #map {
             width: 100%;
-            height: 65vh;
-            min-height: 400px;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid #ccc;
+            height: 60vh;
         }
-
-
-        /* =========================
-           ACTIVE STATUS
-        ========================= */
-
-        .status {
-            margin-top: 15px;
-            padding: 12px;
-
-            background: white;
-
-            border: 1px solid #ddd;
-            border-radius: 8px;
-
-            text-align: center;
-        }
-
-        .status strong {
-            font-size: 18px;
-        }
-
-
-        /* =========================
-           CONTROLS
-        ========================= */
 
         .controls {
+            padding: 12px;
             display: grid;
-
-            grid-template-columns:
-                repeat(4, 1fr);
-
-            gap: 10px;
-
-            margin-top: 15px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            background: white;
         }
 
         button {
-            min-height: 44px;
-
-            padding: 10px 15px;
-
+            padding: 12px;
             border: none;
             border-radius: 6px;
-
-            background: #222;
+            background: #333;
             color: white;
-
-            font-size: 15px;
-
+            font-size: 14px;
             cursor: pointer;
         }
 
         button:hover {
-            background: #444;
+            opacity: 0.85;
         }
 
-        button:active {
-            transform: scale(0.98);
+        .outer-btn {
+            background: #1976d2;
         }
 
-        button.active {
+        .inner-btn {
+            background: #d32f2f;
+        }
+
+        .location-btn {
+            background: #388e3c;
+        }
+
+        .finish-btn {
+            background: #6a1b9a;
+        }
+
+        .clear-btn {
             background: #555;
-
-            outline: 3px solid #aaa;
         }
-
-
-        /* =========================
-           COORDINATE PANELS
-        ========================= */
 
         .coordinates-container {
-
             display: grid;
-
-            grid-template-columns:
-                1fr 1fr;
-
-            gap: 15px;
-
-            margin-top: 15px;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
         }
 
-        .panel {
-
+        .coordinate-box {
             background: white;
-
-            padding: 15px;
-
-            border-radius: 10px;
-
-            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 6px;
         }
 
-        .panel h2 {
-
+        .coordinate-box h3 {
             margin-top: 0;
-
-            font-size: 20px;
         }
 
         textarea {
-
             width: 100%;
-
-            min-height: 180px;
-
-            padding: 10px;
-
-            font-family: monospace;
-
-            font-size: 13px;
-
-            border: 1px solid #ccc;
-
-            border-radius: 6px;
-
+            height: 180px;
             resize: vertical;
-
+            font-family: monospace;
+            font-size: 12px;
         }
-
-
-        /* =========================
-           INSTRUCTIONS
-        ========================= */
 
         .instructions {
-
             background: white;
-
-            margin-top: 15px;
-
+            margin: 10px;
             padding: 15px;
-
-            border-radius: 10px;
-
-            border: 1px solid #ddd;
+            border-radius: 6px;
         }
 
-        .instructions h2 {
-            margin-top: 0;
-        }
+        @media (max-width: 700px) {
+            #map {
+                height: 55vh;
+            }
 
-        .instructions li {
-            margin-bottom: 8px;
-        }
+            .controls {
+                grid-template-columns: repeat(2, 1fr);
+            }
 
+            .coordinates-container {
+                grid-template-columns: 1fr;
+            }
 
-        /* =========================
-           PHONE
-        ========================= */
-
-        @media (max-width: 768px) {
-
-            header {
-                padding: 12px 15px;
+            button {
+                font-size: 13px;
+                padding: 11px 6px;
             }
 
             header h1 {
                 font-size: 20px;
             }
-
-            .container {
-                padding: 10px;
-            }
-
-            #map {
-
-                height: 55vh;
-
-                min-height: 350px;
-
-                border-radius: 8px;
-            }
-
-            .controls {
-
-                grid-template-columns:
-                    1fr 1fr;
-
-                gap: 8px;
-            }
-
-            button {
-
-                width: 100%;
-
-                font-size: 14px;
-
-                padding: 10px 6px;
-            }
-
-            .coordinates-container {
-
-                grid-template-columns: 1fr;
-            }
-
-            .panel {
-
-                padding: 12px;
-            }
-
-            textarea {
-
-                font-size: 12px;
-
-            }
-
         }
-
-
-        /* =========================
-           VERY SMALL PHONES
-        ========================= */
 
         @media (max-width: 400px) {
-
             #map {
-
                 height: 50vh;
-
-                min-height: 300px;
             }
 
             .controls {
-
-                grid-template-columns:
-                    1fr;
+                grid-template-columns: 1fr;
             }
-
-            button {
-
-                font-size: 16px;
-            }
-
         }
-
     </style>
 </head>
 
-
 <body>
 
+<header>
+    <h1>EPICS EVEI Geofence</h1>
+    <div id="status">Ready — choose a bound type</div>
+</header>
+
+<div id="map"></div>
+
+<div class="controls">
+
+    <button class="outer-btn" id="newOuterButton">
+        + New Outer Bound
+    </button>
+
+    <button class="inner-btn" id="newInnerButton">
+        + New Inner Bound
+    </button>
+
+    <button class="finish-btn" id="finishButton">
+        Finish Current Bound
+    </button>
+
+    <button class="location-btn" id="locationButton">
+        📍 My Location
+    </button>
+
+    <button id="toggleButton">
+        Show / Hide Pins
+    </button>
+
+    <button class="clear-btn" id="clearOuterButton">
+        Clear Outer Bounds
+    </button>
+
+    <button class="clear-btn" id="clearInnerButton">
+        Clear Inner Bounds
+    </button>
 
-    <!-- =========================
-         HEADER
-    ========================= -->
+    <button class="clear-btn" id="clearAllButton">
+        Clear Everything
+    </button>
 
-    <header>
+</div>
 
-        <h1>
-            EPICS EVEI Geofence
-        </h1>
+<div class="coordinates-container">
 
-    </header>
+    <div class="coordinate-box">
+        <h3>Outer Bounds</h3>
+        <textarea
+            id="outerCoordinates"
+            readonly
+            placeholder="Outer bound coordinates will appear here..."
+        ></textarea>
+    </div>
+
+    <div class="coordinate-box">
+        <h3>Inner Bounds</h3>
+        <textarea
+            id="innerCoordinates"
+            readonly
+            placeholder="Inner bound coordinates will appear here..."
+        ></textarea>
+    </div>
 
+</div>
 
-    <main class="container">
+<div class="instructions">
+    <h3>How to use</h3>
 
+    <p>
+        <strong>1.</strong> Click <b>New Outer Bound</b> or
+        <b>New Inner Bound</b>.
+    </p>
 
-        <!-- =========================
-             MAP
-        ========================= -->
+    <p>
+        <strong>2.</strong> Click on the map to place pins.
+    </p>
 
-        <div id="map"></div>
+    <p>
+        <strong>3.</strong> You can also press
+        <b>My Location</b> to use your phone's GPS location as a pin.
+    </p>
 
+    <p>
+        <strong>4.</strong> Use <b>My Location</b> multiple times to add
+        multiple GPS pins to the same boundary.
+    </p>
 
-        <!-- =========================
-             STATUS
-        ========================= -->
+    <p>
+        <strong>5.</strong> Add at least 3 points, then press
+        <b>Finish Current Bound</b>.
+    </p>
 
-        <div class="status">
+    <p>
+        <strong>6.</strong> Create another outer or inner bound whenever
+        you want.
+    </p>
 
-            <strong>
-                Currently Creating:
-            </strong>
+    <p>
+        You can create as many outer and inner bounds as needed.
+    </p>
+</div>
 
-            <span id="activeStatus">
-                Outer Bound 1
-            </span>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        </div>
+<script>
 
+    // ==========================================
+    // MAP
+    // ==========================================
 
-        <!-- =========================
-             CONTROLS
-        ========================= -->
+    const map = L.map("map").setView(
+        [40.4237, -86.9212],
+        15
+    );
 
-        <div class="controls">
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap contributors"
+        }
+    ).addTo(map);
 
-            <button
-                id="newOuterButton"
-                class="active">
 
-                New Outer Bound
+    // ==========================================
+    // DATA
+    // ==========================================
 
-            </button>
+    let outerBounds = [];
+    let innerBounds = [];
 
+    let currentBound = null;
+    let currentType = null;
 
-            <button
-                id="newInnerButton">
+    let pinsVisible = true;
 
-                New Inner Bound
 
-            </button>
+    // ==========================================
+    // CREATE A NEW BOUND
+    // ==========================================
 
+    function createBound(type) {
 
-            <button
-                id="finishButton">
+        const bound = {
+            type: type,
+            markers: [],
+            polygon: null,
+            finished: false
+        };
 
-                Finish Current Bound
+        if (type === "outer") {
+            outerBounds.push(bound);
+        } else {
+            innerBounds.push(bound);
+        }
 
-            </button>
+        currentBound = bound;
+        currentType = type;
 
+        updateStatus();
 
-            <button
-                id="toggleButton">
+        return bound;
+    }
 
-                Show / Hide Pins
 
-            </button>
+    // ==========================================
+    // NEW OUTER
+    // ==========================================
 
+    document
+        .getElementById("newOuterButton")
+        .addEventListener("click", function () {
 
-            <button
-                id="clearOuterButton">
+            createBound("outer");
 
-                Clear All Outer
+            alert(
+                "New Outer Bound created.\n\n" +
+                "Click the map or use My Location to add points."
+            );
+        });
 
-            </button>
 
+    // ==========================================
+    // NEW INNER
+    // ==========================================
 
-            <button
-                id="clearInnerButton">
+    document
+        .getElementById("newInnerButton")
+        .addEventListener("click", function () {
 
-                Clear All Inner
+            createBound("inner");
 
-            </button>
+            alert(
+                "New Inner Bound created.\n\n" +
+                "Click the map or use My Location to add points."
+            );
+        });
 
 
-            <button
-                id="clearAllButton">
+    // ==========================================
+    // STATUS
+    // ==========================================
 
-                Clear Everything
+    function updateStatus() {
 
-            </button>
+        const status = document.getElementById("status");
 
+        if (!currentBound) {
+            status.textContent =
+                "Ready — choose a bound type";
 
-            <button
-                id="locationButton">
+            return;
+        }
 
-                My Location
+        const list =
+            currentType === "outer"
+                ? outerBounds
+                : innerBounds;
 
-            </button>
+        const index =
+            list.indexOf(currentBound) + 1;
 
-        </div>
+        const pointCount =
+            currentBound.markers.length;
 
+        if (currentBound.finished) {
 
-        <!-- =========================
-             COORDINATES
-        ========================= -->
+            status.textContent =
+                `${capitalize(currentType)} Bound ${index} finished — ` +
+                `${pointCount} points`;
 
-        <div class="coordinates-container">
+        } else {
 
+            status.textContent =
+                `Drawing ${capitalize(currentType)} Bound ${index} — ` +
+                `${pointCount} points`;
+        }
+    }
 
-            <!-- OUTER -->
 
-            <section class="panel">
+    function capitalize(text) {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    }
 
-                <h2>
-                    Outer Bounds
-                </h2>
 
-                <textarea
-                    id="outerCoordinates"
-                    readonly
-                    placeholder="Outer bounds will appear here..."
-                ></textarea>
+    // ==========================================
+    // ADD A POINT TO CURRENT BOUND
+    // ==========================================
 
-            </section>
+    function addPoint(lat, lng) {
 
+        // If there isn't a bound yet,
+        // automatically create an outer bound.
+        if (!currentBound) {
+            createBound("outer");
+        }
 
-            <!-- INNER -->
+        // Don't add points to a finished bound.
+        if (currentBound.finished) {
 
-            <section class="panel">
+            alert(
+                "This bound is finished.\n\n" +
+                "Create a new bound to add more points."
+            );
 
-                <h2>
-                    Inner Bounds
-                </h2>
+            return;
+        }
 
-                <textarea
-                    id="innerCoordinates"
-                    readonly
-                    placeholder="Inner bounds will appear here..."
-                ></textarea>
-
-            </section>
-
-
-        </div>
-
-
-        <!-- =========================
-             INSTRUCTIONS
-        ========================= -->
-
-        <section class="instructions">
-
-            <h2>
-                Instructions
-            </h2>
-
-            <ol>
-
-                <li>
-                    Click <strong>New Outer Bound</strong>
-                    to start an outer boundary.
-                </li>
-
-                <li>
-                    Click or tap the map to add points.
-                </li>
-
-                <li>
-                    Drag the points to adjust their positions.
-                </li>
-
-                <li>
-                    Click <strong>Finish Current Bound</strong>
-                    when you have at least 3 points.
-                </li>
-
-                <li>
-                    Click <strong>New Outer Bound</strong>
-                    again to create another outer boundary.
-                </li>
-
-                <li>
-                    Click <strong>New Inner Bound</strong>
-                    to create an inner boundary.
-                </li>
-
-                <li>
-                    You can create as many outer and inner
-                    boundaries as you need.
-                </li>
-
-                <li>
-                    Use <strong>Clear All Outer</strong>
-                    or <strong>Clear All Inner</strong>
-                    to remove one type.
-                </li>
-
-            </ol>
-
-        </section>
-
-
-    </main>
-
-
-    <!-- =========================
-         LEAFLET
-    ========================= -->
-
-    <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-    </script>
-
-
-    <script>
-
-
-        /* ==================================================
-           CREATE MAP
-        ================================================== */
-
-        const map = L.map("map").setView(
-            [40.4237, -86.9212],
-            15
-        );
-
-
-        /* ==================================================
-           OPEN STREET MAP
-        ================================================== */
-
-        L.tileLayer(
-
-            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-
+        const marker = L.marker(
+            [lat, lng],
             {
-
-                maxZoom: 19,
-
-                attribution:
-                    "&copy; OpenStreetMap contributors"
-
+                draggable: true
             }
+        );
 
+        marker.addTo(map);
+
+        currentBound.markers.push(marker);
+
+
+        // When marker is dragged,
+        // redraw the polygon.
+        marker.on("drag", function () {
+
+            drawPolygon(currentBound);
+            updateCoordinates();
+
+        });
+
+
+        marker.on("dragend", function () {
+
+            drawPolygon(currentBound);
+            updateCoordinates();
+
+        });
+
+
+        drawPolygon(currentBound);
+
+        updateCoordinates();
+
+        updateStatus();
+    }
+
+
+    // ==========================================
+    // MAP CLICK
+    // ==========================================
+
+    map.on("click", function (event) {
+
+        addPoint(
+            event.latlng.lat,
+            event.latlng.lng
+        );
+
+    });
+
+
+    // ==========================================
+    // DRAW POLYGON
+    // ==========================================
+
+    function drawPolygon(bound) {
+
+        // Remove previous polygon
+        if (bound.polygon) {
+
+            map.removeLayer(bound.polygon);
+
+            bound.polygon = null;
+        }
+
+
+        // Need at least 3 points
+        if (bound.markers.length < 3) {
+            return;
+        }
+
+
+        const points =
+            bound.markers.map(function (marker) {
+
+                return marker.getLatLng();
+
+            });
+
+
+        let polygonColor;
+
+        if (bound.type === "outer") {
+            polygonColor = "#1976d2";
+        } else {
+            polygonColor = "#d32f2f";
+        }
+
+
+        bound.polygon = L.polygon(
+            points,
+            {
+                color: polygonColor,
+                fillColor: polygonColor,
+                fillOpacity: 0.20,
+                weight: 3
+            }
         ).addTo(map);
+    }
 
 
-        /* ==================================================
-           DATA STRUCTURE
+    // ==========================================
+    // FINISH CURRENT BOUND
+    // ==========================================
 
-           Every bound looks like:
+    document
+        .getElementById("finishButton")
+        .addEventListener("click", function () {
 
-           {
-               markers: [],
-               polygon: null
-           }
+            if (!currentBound) {
 
-        ================================================== */
-
-        let outerBounds = [];
-
-        let innerBounds = [];
-
-
-        /*
-            The bound currently being created
-        */
-
-        let currentBound = null;
-
-        let currentType = "outer";
-
-
-        /*
-            Pin visibility
-        */
-
-        let pinsVisible = true;
-
-
-        /* ==================================================
-           BUTTONS
-        ================================================== */
-
-        const newOuterButton =
-            document.getElementById(
-                "newOuterButton"
-            );
-
-
-        const newInnerButton =
-            document.getElementById(
-                "newInnerButton"
-            );
-
-
-        const activeStatus =
-            document.getElementById(
-                "activeStatus"
-            );
-
-
-        /* ==================================================
-           CREATE NEW OUTER BOUND
-        ================================================== */
-
-        newOuterButton.addEventListener(
-
-            "click",
-
-            function() {
-
-                currentType = "outer";
-
-
-                const newBound = {
-
-                    markers: [],
-
-                    polygon: null
-
-                };
-
-
-                outerBounds.push(
-                    newBound
+                alert(
+                    "Create an Outer or Inner Bound first."
                 );
 
-
-                currentBound =
-                    newBound;
-
-
-                updateStatus();
-
-
-                newOuterButton.classList.add(
-                    "active"
-                );
-
-
-                newInnerButton.classList.remove(
-                    "active"
-                );
-
+                return;
             }
 
+
+            if (currentBound.markers.length < 3) {
+
+                alert(
+                    "A bound needs at least 3 points."
+                );
+
+                return;
+            }
+
+
+            currentBound.finished = true;
+
+            drawPolygon(currentBound);
+
+            updateCoordinates();
+
+            updateStatus();
+
+            alert(
+                capitalize(currentType) +
+                " Bound finished!"
+            );
+        });
+
+
+    // ==========================================
+    // MY LOCATION
+    // ==========================================
+
+    document
+        .getElementById("locationButton")
+        .addEventListener("click", function () {
+
+            if (!navigator.geolocation) {
+
+                alert(
+                    "Your browser does not support location services."
+                );
+
+                return;
+            }
+
+
+            // Automatically create an outer bound
+            // if the user hasn't created one yet.
+            if (!currentBound) {
+
+                createBound("outer");
+            }
+
+
+            // If current bound is finished,
+            // create a new bound of the same type.
+            if (currentBound.finished) {
+
+                createBound(currentType);
+            }
+
+
+            const status =
+                document.getElementById("status");
+
+            status.textContent =
+                "Getting your location...";
+
+
+            navigator.geolocation.getCurrentPosition(
+
+                function (position) {
+
+                    const lat =
+                        position.coords.latitude;
+
+                    const lng =
+                        position.coords.longitude;
+
+
+                    // Add GPS position as a normal pin
+                    addPoint(lat, lng);
+
+
+                    // Move map to your location
+                    map.setView(
+                        [lat, lng],
+                        17
+                    );
+
+
+                    updateStatus();
+                },
+
+
+                function (error) {
+
+                    console.error(error);
+
+                    alert(
+                        "Could not get your location.\n\n" +
+                        "Make sure location permission is enabled " +
+                        "for this website."
+                    );
+
+                    updateStatus();
+                },
+
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        });
+
+
+    // ==========================================
+    // SHOW / HIDE PINS
+    // ==========================================
+
+    document
+        .getElementById("toggleButton")
+        .addEventListener("click", function () {
+
+            pinsVisible = !pinsVisible;
+
+
+            const allBounds =
+                outerBounds.concat(innerBounds);
+
+
+            allBounds.forEach(function (bound) {
+
+                bound.markers.forEach(function (marker) {
+
+                    if (pinsVisible) {
+
+                        if (!map.hasLayer(marker)) {
+                            marker.addTo(map);
+                        }
+
+                    } else {
+
+                        if (map.hasLayer(marker)) {
+                            map.removeLayer(marker);
+                        }
+                    }
+
+                });
+
+            });
+
+        });
+
+
+    // ==========================================
+    // UPDATE COORDINATES
+    // ==========================================
+
+    function updateCoordinates() {
+
+        let outerText = "";
+
+        outerBounds.forEach(
+            function (bound, index) {
+
+                outerText +=
+                    `OUTER BOUND ${index + 1}\n`;
+
+                bound.markers.forEach(
+                    function (marker, pointIndex) {
+
+                        const position =
+                            marker.getLatLng();
+
+                        outerText +=
+                            `${pointIndex + 1}: ` +
+                            `${position.lat.toFixed(6)}, ` +
+                            `${position.lng.toFixed(6)}\n`;
+                    }
+                );
+
+                outerText += "\n";
+            }
         );
 
 
-        /* ==================================================
-           CREATE NEW INNER BOUND
-        ================================================== */
+        let innerText = "";
 
-        newInnerButton.addEventListener(
+        innerBounds.forEach(
+            function (bound, index) {
 
-            "click",
+                innerText +=
+                    `INNER BOUND ${index + 1}\n`;
 
-            function() {
+                bound.markers.forEach(
+                    function (marker, pointIndex) {
 
-                currentType = "inner";
+                        const position =
+                            marker.getLatLng();
 
-
-                const newBound = {
-
-                    markers: [],
-
-                    polygon: null
-
-                };
-
-
-                innerBounds.push(
-                    newBound
+                        innerText +=
+                            `${pointIndex + 1}: ` +
+                            `${position.lat.toFixed(6)}, ` +
+                            `${position.lng.toFixed(6)}\n`;
+                    }
                 );
 
-
-                currentBound =
-                    newBound;
-
-
-                updateStatus();
-
-
-                newInnerButton.classList.add(
-                    "active"
-                );
-
-
-                newOuterButton.classList.remove(
-                    "active"
-                );
-
+                innerText += "\n";
             }
-
         );
 
 
-        /* ==================================================
-           UPDATE STATUS
-        ================================================== */
+        document.getElementById(
+            "outerCoordinates"
+        ).value = outerText;
 
-        function updateStatus() {
+
+        document.getElementById(
+            "innerCoordinates"
+        ).value = innerText;
+    }
+
+
+    // ==========================================
+    // CLEAR OUTER
+    // ==========================================
+
+    document
+        .getElementById("clearOuterButton")
+        .addEventListener("click", function () {
+
+            outerBounds.forEach(function (bound) {
+
+                bound.markers.forEach(function (marker) {
+
+                    map.removeLayer(marker);
+
+                });
+
+
+                if (bound.polygon) {
+                    map.removeLayer(bound.polygon);
+                }
+
+            });
+
+
+            outerBounds = [];
 
 
             if (currentType === "outer") {
-
-                const number =
-                    outerBounds.indexOf(
-                        currentBound
-                    ) + 1;
-
-
-                activeStatus.textContent =
-                    "Outer Bound " + number;
-
+                currentBound = null;
             }
 
 
-            else {
-
-                const number =
-                    innerBounds.indexOf(
-                        currentBound
-                    ) + 1;
+            updateCoordinates();
+            updateStatus();
+        });
 
 
-                activeStatus.textContent =
-                    "Inner Bound " + number;
+    // ==========================================
+    // CLEAR INNER
+    // ==========================================
 
-            }
+    document
+        .getElementById("clearInnerButton")
+        .addEventListener("click", function () {
 
-        }
+            innerBounds.forEach(function (bound) {
 
+                bound.markers.forEach(function (marker) {
 
-        /* ==================================================
-           DRAW POLYGON
-        ================================================== */
+                    map.removeLayer(marker);
 
-        function drawPolygon(bound) {
-
-
-            /*
-                Remove old polygon
-            */
-
-            if (bound.polygon) {
-
-                map.removeLayer(
-                    bound.polygon
-                );
-
-                bound.polygon = null;
-
-            }
+                });
 
 
-            /*
-                Need at least 3 points
-            */
+                if (bound.polygon) {
+                    map.removeLayer(bound.polygon);
+                }
 
-            if (
-                bound.markers.length < 3
-            ) {
+            });
 
-                return;
 
+            innerBounds = [];
+
+
+            if (currentType === "inner") {
+                currentBound = null;
             }
 
 
-            const points =
-                bound.markers.map(
+            updateCoordinates();
+            updateStatus();
+        });
 
-                    function(marker) {
 
-                        return marker.getLatLng();
+    // ==========================================
+    // CLEAR EVERYTHING
+    // ==========================================
 
-                    }
+    document
+        .getElementById("clearAllButton")
+        .addEventListener("click", function () {
 
-                );
+            const allBounds =
+                outerBounds.concat(innerBounds);
 
 
-            /*
-                Outer = blue
-                Inner = red
-            */
+            allBounds.forEach(function (bound) {
 
-            const color =
-                outerBounds.includes(bound)
-                    ? "blue"
-                    : "red";
+                bound.markers.forEach(function (marker) {
 
+                    map.removeLayer(marker);
 
-            bound.polygon =
-                L.polygon(
+                });
 
-                    points,
 
-                    {
+                if (bound.polygon) {
 
-                        color: color,
-
-                        fillOpacity:
-                            0.20,
-
-                        weight: 3
-
-                    }
-
-                ).addTo(map);
-
-        }
-
-
-        /* ==================================================
-           ADD POINT TO CURRENT BOUND
-        ================================================== */
-
-        map.on(
-
-            "click",
-
-            function(event) {
-
-
-                /*
-                    If there isn't a current bound,
-                    create one automatically.
-                */
-
-                if (!currentBound) {
-
-                    if (
-                        currentType === "outer"
-                    ) {
-
-                        const newBound = {
-
-                            markers: [],
-
-                            polygon: null
-
-                        };
-
-                        outerBounds.push(
-                            newBound
-                        );
-
-                        currentBound =
-                            newBound;
-
-                    }
-
-                    else {
-
-                        const newBound = {
-
-                            markers: [],
-
-                            polygon: null
-
-                        };
-
-                        innerBounds.push(
-                            newBound
-                        );
-
-                        currentBound =
-                            newBound;
-
-                    }
-
-                    updateStatus();
-
-                }
-
-
-                /*
-                    Create marker
-                */
-
-                const marker =
-                    L.marker(
-
-                        event.latlng,
-
-                        {
-                            draggable: true
-                        }
-
-                    ).addTo(map);
-
-
-                /*
-                    Store marker
-                */
-
-                currentBound.markers.push(
-                    marker
-                );
-
-
-                /*
-                    Update while dragging
-                */
-
-                marker.on(
-
-                    "drag",
-
-                    function() {
-
-                        drawPolygon(
-                            currentBound
-                        );
-
-                        updateCoordinates();
-
-                    }
-
-                );
-
-
-                /*
-                    Update after dragging
-                */
-
-                marker.on(
-
-                    "dragend",
-
-                    function() {
-
-                        drawPolygon(
-                            currentBound
-                        );
-
-                        updateCoordinates();
-
-                    }
-
-                );
-
-
-                /*
-                    Redraw
-                */
-
-                drawPolygon(
-                    currentBound
-                );
-
-
-                updateCoordinates();
-
-            }
-
-        );
-
-
-        /* ==================================================
-           FINISH CURRENT BOUND
-        ================================================== */
-
-        document
-            .getElementById(
-                "finishButton"
-            )
-            .addEventListener(
-
-                "click",
-
-                function() {
-
-
-                    if (!currentBound) {
-
-                        alert(
-                            "Create a bound first."
-                        );
-
-                        return;
-
-                    }
-
-
-                    if (
-                        currentBound.markers.length < 3
-                    ) {
-
-                        alert(
-                            "A bound needs at least 3 points."
-                        );
-
-                        return;
-
-                    }
-
-
-                    drawPolygon(
-                        currentBound
-                    );
-
-
-                    alert(
-                        currentType === "outer"
-                            ? "Outer bound completed!"
-                            : "Inner bound completed!"
+                    map.removeLayer(
+                        bound.polygon
                     );
 
                 }
 
-            );
+            });
 
 
-        /* ==================================================
-           UPDATE COORDINATES
-        ================================================== */
+            outerBounds = [];
+            innerBounds = [];
 
-        function updateCoordinates() {
+            currentBound = null;
+            currentType = null;
 
 
-            let outerText = "";
+            updateCoordinates();
+            updateStatus();
+        });
 
 
-            outerBounds.forEach(
+    // ==========================================
+    // INITIALIZE
+    // ==========================================
 
-                function(bound, index) {
+    updateCoordinates();
+    updateStatus();
 
-
-                    outerText +=
-                        "OUTER BOUND " +
-                        (index + 1) +
-                        "\n";
-
-
-                    bound.markers.forEach(
-
-                        function(marker, pointIndex) {
-
-                            const position =
-                                marker.getLatLng();
-
-
-                            outerText +=
-
-                                "  Point " +
-                                (pointIndex + 1) +
-                                ": " +
-
-                                position.lat.toFixed(6) +
-
-                                ", " +
-
-                                position.lng.toFixed(6) +
-
-                                "\n";
-
-                        }
-
-                    );
-
-
-                    outerText += "\n";
-
-                }
-
-            );
-
-
-            let innerText = "";
-
-
-            innerBounds.forEach(
-
-                function(bound, index) {
-
-
-                    innerText +=
-                        "INNER BOUND " +
-                        (index + 1) +
-                        "\n";
-
-
-                    bound.markers.forEach(
-
-                        function(marker, pointIndex) {
-
-                            const position =
-                                marker.getLatLng();
-
-
-                            innerText +=
-
-                                "  Point " +
-                                (pointIndex + 1) +
-                                ": " +
-
-                                position.lat.toFixed(6) +
-
-                                ", " +
-
-                                position.lng.toFixed(6) +
-
-                                "\n";
-
-                        }
-
-                    );
-
-
-                    innerText += "\n";
-
-                }
-
-            );
-
-
-            document.getElementById(
-                "outerCoordinates"
-            ).value = outerText;
-
-
-            document.getElementById(
-                "innerCoordinates"
-            ).value = innerText;
-
-        }
-
-
-        /* ==================================================
-           CLEAR ALL OUTER
-        ================================================== */
-
-        document
-            .getElementById(
-                "clearOuterButton"
-            )
-            .addEventListener(
-
-                "click",
-
-                function() {
-
-
-                    outerBounds.forEach(
-
-                        function(bound) {
-
-
-                            bound.markers.forEach(
-
-                                function(marker) {
-
-                                    map.removeLayer(
-                                        marker
-                                    );
-
-                                }
-
-                            );
-
-
-                            if (bound.polygon) {
-
-                                map.removeLayer(
-                                    bound.polygon
-                                );
-
-                            }
-
-                        }
-
-                    );
-
-
-                    outerBounds = [];
-
-
-                    if (
-                        currentType === "outer"
-                    ) {
-
-                        currentBound = null;
-
-                    }
-
-
-                    updateCoordinates();
-
-                    updateStatus();
-
-                }
-
-            );
-
-
-        /* ==================================================
-           CLEAR ALL INNER
-        ================================================== */
-
-        document
-            .getElementById(
-                "clearInnerButton"
-            )
-            .addEventListener(
-
-                "click",
-
-                function() {
-
-
-                    innerBounds.forEach(
-
-                        function(bound) {
-
-
-                            bound.markers.forEach(
-
-                                function(marker) {
-
-                                    map.removeLayer(
-                                        marker
-                                    );
-
-                                }
-
-                            );
-
-
-                            if (bound.polygon) {
-
-                                map.removeLayer(
-                                    bound.polygon
-                                );
-
-                            }
-
-                        }
-
-                    );
-
-
-                    innerBounds = [];
-
-
-                    if (
-                        currentType === "inner"
-                    ) {
-
-                        currentBound = null;
-
-                    }
-
-
-                    updateCoordinates();
-
-                    updateStatus();
-
-                }
-
-            );
-
-
-        /* ==================================================
-           CLEAR EVERYTHING
-        ================================================== */
-
-        document
-            .getElementById(
-                "clearAllButton"
-            )
-            .addEventListener(
-
-                "click",
-
-                function() {
-
-
-                    /*
-                        Remove outer
-                    */
-
-                    outerBounds.forEach(
-
-                        function(bound) {
-
-                            bound.markers.forEach(
-
-                                function(marker) {
-
-                                    map.removeLayer(
-                                        marker
-                                    );
-
-                                }
-
-                            );
-
-
-                            if (bound.polygon) {
-
-                                map.removeLayer(
-                                    bound.polygon
-                                );
-
-                            }
-
-                        }
-
-                    );
-
-
-                    /*
-                        Remove inner
-                    */
-
-                    innerBounds.forEach(
-
-                        function(bound) {
-
-                            bound.markers.forEach(
-
-                                function(marker) {
-
-                                    map.removeLayer(
-                                        marker
-                                    );
-
-                                }
-
-                            );
-
-
-                            if (bound.polygon) {
-
-                                map.removeLayer(
-                                    bound.polygon
-                                );
-
-                            }
-
-                        }
-
-                    );
-
-
-                    outerBounds = [];
-
-                    innerBounds = [];
-
-                    currentBound = null;
-
-
-                    updateCoordinates();
-
-                    updateStatus();
-
-                }
-
-            );
-
-
-        /* ==================================================
-           SHOW / HIDE PINS
-        ================================================== */
-
-        document
-            .getElementById(
-                "toggleButton"
-            )
-            .addEventListener(
-
-                "click",
-
-                function() {
-
-
-                    pinsVisible =
-                        !pinsVisible;
-
-
-                    const allBounds =
-                        outerBounds.concat(
-                            innerBounds
-                        );
-
-
-                    allBounds.forEach(
-
-                        function(bound) {
-
-
-                            bound.markers.forEach(
-
-                                function(marker) {
-
-
-                                    if (
-                                        pinsVisible
-                                    ) {
-
-                                        marker.addTo(
-                                            map
-                                        );
-
-                                    }
-
-                                    else {
-
-                                        map.removeLayer(
-                                            marker
-                                        );
-
-                                    }
-
-                                }
-
-                            );
-
-                        }
-
-                    );
-
-                }
-
-            );
-
-
-        /* ==================================================
-           MY LOCATION
-        ================================================== */
-
-        document
-            .getElementById(
-                "locationButton"
-            )
-            .addEventListener(
-
-                "click",
-
-                function() {
-
-
-                    if (
-                        !navigator.geolocation
-                    ) {
-
-                        alert(
-                            "Geolocation is not supported by your browser."
-                        );
-
-                        return;
-
-                    }
-
-
-                    navigator.geolocation
-                        .getCurrentPosition(
-
-                            function(position) {
-
-
-                                const lat =
-                                    position.coords.latitude;
-
-
-                                const lng =
-                                    position.coords.longitude;
-
-
-                                map.setView(
-
-                                    [lat, lng],
-
-                                    18
-
-                                );
-
-
-                                L.marker(
-
-                                    [lat, lng]
-
-                                )
-
-                                    .addTo(map)
-
-                                    .bindPopup(
-                                        "Your location"
-                                    )
-
-                                    .openPopup();
-
-                            },
-
-
-                            function() {
-
-                                alert(
-                                    "Unable to get your location."
-                                );
-
-                            }
-
-                        );
-
-                }
-
-            );
-
-
-        /* ==================================================
-           FIX MAP SIZE
-        ================================================== */
-
-        setTimeout(
-
-            function() {
-
-                map.invalidateSize();
-
-            },
-
-            200
-
-        );
-
-
-    </script>
+</script>
 
 </body>
-
 </html>
